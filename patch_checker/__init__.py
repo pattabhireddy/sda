@@ -1,18 +1,16 @@
 """
 patch_checker/__init__.py
-Unified entry point for multi-platform security advisory fetching.
-Supported platforms: redhat, suse, windows
+Entry point for Red Hat security advisory fetching.
+Supported platforms: redhat
 """
 
 from .redhat import fetch_redhat_advisories
-from .suse import fetch_suse_advisories
 from .utils import format_advisory_summary
 
-SUPPORTED_PLATFORMS = ["redhat", "suse"]
+SUPPORTED_PLATFORMS = ["redhat"]
 
 _FETCHERS = {
     "redhat": fetch_redhat_advisories,
-    "suse":   fetch_suse_advisories,
 }
 
 
@@ -40,7 +38,6 @@ def fetch_advisories(platform: str, after_date: str | None = None) -> list[dict]
 __all__ = [
     "fetch_advisories",
     "fetch_redhat_advisories",
-    "fetch_suse_advisories",
     "format_advisory_summary",
     "SUPPORTED_PLATFORMS",
 ]

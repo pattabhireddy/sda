@@ -2,22 +2,20 @@
 run_scheduled_check.py
 Standalone entry point for the GitHub Actions scheduled workflow.
 
-Fetches security advisories from all configured platforms, sends an email
-notification if new advisories are found, or a heartbeat "all clear" email
-if nothing is found.  State (last check date) is persisted in Azure Blob Storage
-so consecutive runs never re-notify for the same advisory.
+Fetches Red Hat security advisories, sends an email notification if new
+advisories are found, or a heartbeat "all clear" email if nothing is found.
+State (last check date) is persisted in Azure Blob Storage so consecutive
+runs never re-notify for the same advisory.
 
 Environment variables (set as GitHub Secrets in the workflow):
     AZURE_STORAGE_CONNECTION_STRING  — for state persistence
     ACS_CONNECTION_STRING            — Azure Communication Services
     ACS_SENDER_ADDRESS               — verified ACS sender
     NOTIFY_TO_EMAIL                  — recipient(s), comma-separated
-    RHEL_VERSIONS                    — e.g. "8,9"   (default: "8,9")
-    SUSE_VERSIONS                    — e.g. "12,15" (default: "12,15")
+    RHEL_VERSIONS                    — e.g. "8,9" (default: "8,9")
 
 Optional (manual workflow_dispatch inputs passed as env vars):
     OVERRIDE_AFTER_DATE  — override the stored last-check date
-    OVERRIDE_PLATFORMS   — override platforms to check (default: "redhat,suse")
 """
 
 import logging
@@ -40,10 +38,7 @@ def main() -> None:
     utc_now = datetime.now(timezone.utc)
     logging.info(f"Patch monitor check started at {utc_now.isoformat()}")
 
-    # Resolve platforms — allow workflow_dispatch override
-    platforms_env = os.environ.get("OVERRIDE_PLATFORMS", "").strip()
-    platforms = [p.strip() for p in platforms_env.split(",") if p.strip()] \
-        if platforms_env else ["redhat", "suse"]
+    platforms = ["redhat"]
     logging.info(f"Platforms to check: {platforms}")
 
     # Resolve after_date — allow workflow_dispatch override, else use stored state

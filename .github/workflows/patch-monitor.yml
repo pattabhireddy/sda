@@ -29,10 +29,6 @@ on:
         description: "Check advisories after this date (YYYY-MM-DD). Leave blank to use stored state."
         required: false
         default: ""
-      platforms:
-        description: "Comma-separated platforms to check (redhat,suse)"
-        required: false
-        default: "redhat,suse"
 
 jobs:
   check-and-notify:
@@ -45,11 +41,8 @@ jobs:
       ACS_SENDER_ADDRESS:              ${{ secrets.ACS_SENDER_ADDRESS }}
       NOTIFY_TO_EMAIL:                 ${{ secrets.NOTIFY_TO_EMAIL }}
       RHEL_VERSIONS:                   "8,9"
-      SUSE_VERSIONS:                   "12,15"
-      STREAMLIT_APP_URL:               ""
       # Pass manual-trigger inputs as env vars (ignored on scheduled runs)
       OVERRIDE_AFTER_DATE:             ${{ github.event.inputs.after_date }}
-      OVERRIDE_PLATFORMS:              ${{ github.event.inputs.platforms }}
 
     steps:
       - name: Checkout code

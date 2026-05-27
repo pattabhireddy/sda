@@ -1,8 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
-  <!-- Back person (right, slightly smaller) -->
-  <circle cx="64" cy="26" r="12" fill="#2DC84D"/>
-  <path d="M41,76 C41,57 88,57 88,76 Z" fill="#2DC84D"/>
-  <!-- Front person (left, larger) — white outline separates from back person -->
-  <circle cx="38" cy="32" r="14" fill="#2DC84D" stroke="white" stroke-width="3"/>
-  <path d="M10,84 C10,62 66,62 66,84 Z" fill="#2DC84D" stroke="white" stroke-width="3"/>
-</svg>
