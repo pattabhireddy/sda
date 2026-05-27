@@ -1,0 +1,31 @@
+# Git
+.git
+.gitignore
+
+# Local dev settings (contains secrets — never in image)
+local.settings.json
+
+# Python cache
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Virtual environments
+.venv
+venv
+env
+
+# IDE / OS
+.vscode
+.idea
+*.DS_Store
+Thumbs.db
+
+# Docs
+README.md
+*.md
+
+# CI/CD
+azure-pipelines.yml

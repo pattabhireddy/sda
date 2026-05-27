@@ -1,0 +1,68 @@
+# ============================================================
+# .github/workflows/patch-monitor.yml
+# Patch Monitor Agent — GitHub Actions Scheduled Workflow
+#
+# Runs every 6 hours and sends email notifications for new
+# RHEL and SUSE security advisories via Azure Communication Services.
+#
+# No Azure Function App required — GitHub's hosted runners execute
+# the Python check directly.
+#
+# Required GitHub Secrets (Settings → Secrets and variables → Actions):
+#   AZURE_STORAGE_CONNECTION_STRING  — Azure Blob Storage (state tracking)
+#   ACS_CONNECTION_STRING            — Azure Communication Services email
+#   ACS_SENDER_ADDRESS               — Verified ACS sender address
+#   NOTIFY_TO_EMAIL                  — Recipient email address(es)
+# ============================================================
+
+name: Patch Monitor — Scheduled Check
+
+on:
+  # Run at 00:00, 06:00, 12:00, 18:00 UTC every day
+  schedule:
+    - cron: "0 0,6,12,18 * * *"
+
+  # Allow manual trigger from GitHub Actions tab
+  workflow_dispatch:
+    inputs:
+      after_date:
+        description: "Check advisories after this date (YYYY-MM-DD). Leave blank to use stored state."
+        required: false
+        default: ""
+      platforms:
+        description: "Comma-separated platforms to check (redhat,suse)"
+        required: false
+        default: "redhat,suse"
+
+jobs:
+  check-and-notify:
+    name: Fetch Advisories & Send Notification
+    runs-on: ubuntu-latest
+
+    env:
+      AZURE_STORAGE_CONNECTION_STRING: ${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}
+      ACS_CONNECTION_STRING:           ${{ secrets.ACS_CONNECTION_STRING }}
+      ACS_SENDER_ADDRESS:              ${{ secrets.ACS_SENDER_ADDRESS }}
+      NOTIFY_TO_EMAIL:                 ${{ secrets.NOTIFY_TO_EMAIL }}
+      RHEL_VERSIONS:                   "8,9"
+      SUSE_VERSIONS:                   "12,15"
+      STREAMLIT_APP_URL:               ""
+      # Pass manual-trigger inputs as env vars (ignored on scheduled runs)
+      OVERRIDE_AFTER_DATE:             ${{ github.event.inputs.after_date }}
+      OVERRIDE_PLATFORMS:              ${{ github.event.inputs.platforms }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run patch monitor check
+        run: python run_scheduled_check.py
