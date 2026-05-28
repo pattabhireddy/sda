@@ -66,11 +66,13 @@ def main() -> None:
         )
         if sent:
             logging.info("Notification email sent successfully.")
-            # Only advance the state when we actually notified — keeps the window
-            # open so same-day advisories published after this run are not missed.
-            today = utc_now.strftime("%Y-%m-%d")
-            update_last_check_time(today)
-            logging.info(f"State updated to: {today}")
+            # Advance state to tomorrow so the next run queries strictly AFTER
+            # today — prevents the same advisories being re-sent on the next run
+            # because the Red Hat API `after` parameter is inclusive.
+            from datetime import timedelta
+            next_check_date = (utc_now + timedelta(days=1)).strftime("%Y-%m-%d")
+            update_last_check_time(next_check_date)
+            logging.info(f"State updated to: {next_check_date}")
         else:
             logging.error("Failed to send notification email — state NOT updated.")
             sys.exit(1)
